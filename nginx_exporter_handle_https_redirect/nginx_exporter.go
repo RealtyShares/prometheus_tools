@@ -76,7 +76,12 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
-	resp, err := e.client.Get(e.URI)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", e.URI, nil)
+	req.Header.Set("X-Forwarded-Proto", "https")
+	res, err := client.Do(req)
+	// resp, err := e.client.Get(e.URI)
 	if err != nil {
 		return fmt.Errorf("Error scraping nginx: %v", err)
 	}
